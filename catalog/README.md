@@ -1,13 +1,13 @@
 # Benchmark catalog
 
-638 measurements from 2026-06-21 through 2026-07-27.
+657 measurements from 2026-06-21 through 2026-08-05.
 
 | coverage | count |
 |---|---:|
-| campaigns | 20 |
-| model families | 14 |
+| campaigns | 21 |
+| model families | 15 |
 | quant categories | 23 |
-| rows with launch argv or command | 637 |
+| rows with launch argv or command | 656 |
 | rows with inferred metadata | 137 |
 
 ## Browse by model
@@ -17,6 +17,7 @@
 - [Gemma-4-31B](models/gemma-4-31b.md) (3)
 - [Gemma-4-E2B-it](models/gemma-4-e2b-it.md) (12)
 - [Laguna-S-2.1](models/laguna-s-2-1.md) (136)
+- [Ling-3.0-flash](models/ling-3-0-flash.md) (19)
 - [Mistral-7B](models/mistral-7b.md) (117)
 - [Qwen3-4B](models/qwen3-4b.md) (54)
 - [Qwen3.5-122B](models/qwen3-5-122b.md) (4)
@@ -37,6 +38,7 @@
 - [kv-sweep](campaigns/kv-sweep.md) (55)
 - [laguna-dflash](campaigns/laguna-dflash.md) (80)
 - [laguna-quant-ab](campaigns/laguna-quant-ab.md) (56)
+- [ling3-flash-int4-2026-08-05](campaigns/ling3-flash-int4-2026-08-05.md) (19)
 - [moep-half-experts](campaigns/moep-half-experts.md) (12)
 - [nvfp4-driver](campaigns/nvfp4-driver.md) (5)
 - [orchestrator](campaigns/orchestrator.md) (94)
@@ -55,5 +57,6 @@
 - [vllm (531)](engines/vllm.md)
 - [llama.cpp (69)](engines/llama-cpp.md)
 - [exllamav3 (38), experimental slice](engines/exllamav3.md)
+- [sglang (19)](engines/sglang.md)
 
 Generated from `data/benchmarks.jsonl`. Do not edit by hand.

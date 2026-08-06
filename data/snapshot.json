@@ -1,15 +1,16 @@
 {
-  "campaigns": 20,
+  "campaigns": 21,
   "engines": {
     "exllamav3": 38,
     "llama.cpp": 69,
+    "sglang": 19,
     "vllm": 531
   },
   "first_date": "2026-06-21",
-  "generated_at": "2026-07-27T20:56:37.190596+00:00",
-  "jsonl_sha256": "2091a37fd175fed9e6d77653e3023106d8056b56efa100e2de2ddf7327014a71",
-  "last_date": "2026-07-27",
-  "measurements": 638,
-  "model_families": 14,
+  "generated_at": "2026-08-06T05:58:02.512566+00:00",
+  "jsonl_sha256": "6f91297f4b85ac06de30124b428a5184df3ddb3007903afeebcd082e07d766eb",
+  "last_date": "2026-08-05",
+  "measurements": 657,
+  "model_families": 15,
   "schema_version": 2
 }
