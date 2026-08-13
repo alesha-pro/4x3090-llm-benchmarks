@@ -98,6 +98,124 @@ python3 scripts/query.py --campaign tp-ab-p2p
 
 More examples are in [QUERYING.md](QUERYING.md).
 
+## Uploading this archive to LocalMaxxing
+
+LocalMaxxing turns the archive into searchable benchmark entries that can be
+filtered by model, quantization, engine, hardware, topology, context length, and
+workload. Publishing there makes the measurements discoverable without losing
+the commands and provenance that make them reproducible. It does not turn the
+archive into a global ranking: aggregate throughput and single-stream decode
+remain different measurement kinds and should still be compared within matched
+campaigns.
+
+### What gets uploaded
+
+For the current 638-row snapshot, the reviewed upload plan selects:
+
+| Upload decision | Rows | Why |
+|---|---:|---|
+| Ready for upload | 552 | Positive output throughput, known metric semantics, and an exact Hugging Face artifact mapping |
+| Excluded | 64 | Output throughput semantics are unknown |
+| Excluded | 22 | No output tok/s measurement is present |
+
+The 552 ready rows contain 137 single-stream measurements and 415 aggregate-
+throughput measurements. Throughput-only rows are included even when TTFT,
+prefill throughput, total throughput, or VRAM was not recorded; unavailable
+fields are omitted rather than invented.
+
+Each payload includes the available performance metrics plus the measured model
+artifact, quantization, engine and version, four-RTX-3090 hardware description,
+parallelism and concurrency, context and token counts, KV-cache and speculative-
+decoding settings, source run ID, notes, and the exact launch command when the
+archive contains one. `model-map.json` maps local checkpoint names to the
+repository containing the measured artifact instead of silently mapping every
+quant to its base model.
+
+### Run the reviewed uploader
+
+Agents should follow the executable preflight, validation, upload, resume, and
+completion-report sequence in [`AGENTS.md`](AGENTS.md). It includes the
+public-write authorization boundary and ambiguous-timeout recovery rules.
+
+Install or update to `localmaxxing-cli` v0.1.33 or newer first:
+ 
+```bash
+lmx update
+lmx version --json
+```
+
+The importer uses the current `lmx speed-test validate-local|dry-run|submit`
+command group; older `lmx benchmark ...` commands are no longer supported.
+The key may be supplied
+through `LMX_API_KEY` or saved by `lmx`:
+
+```bash
+printf '%s\n' "$LMX_API_KEY" | lmx auth --key-stdin
+```
+
+Inspecting the complete selection is offline and does not publish anything:
+
+```bash
+python3 scripts/import_localmaxxing.py plan \
+  --model-map model-map.json \
+  --allow-partial-metrics
+```
+
+Authenticated production validation is also non-publishing:
+
+```bash
+python3 scripts/import_localmaxxing.py dry-run \
+  --transport api \
+  --model-map model-map.json \
+  --allow-partial-metrics
+```
+
+The archive-specific uploader performs the same plan, production-dry-runs every
+ready payload, and starts public submission only after every ready row validates:
+
+```bash
+./upload-localmaxxing --allow-aggregate-submit
+```
+
+`--allow-aggregate-submit` is deliberately required before any network
+validation or write because LocalMaxxing currently stores aggregate throughput
+and single-stream output tok/s in the same leaderboard metric. Passing it
+acknowledges that the 415 aggregate rows are intentionally being published and
+must not be compared as single-user decode rates.
+
+The uploader assumes a LocalMaxxing Pro account. It waits 13 seconds between
+submissions, staying below the Pro limit of 300 benchmark submissions per
+rolling hour. A complete 552-row upload takes about two hours before retries.
+The generic `submit` action retains a free-account-safe 121-second default.
+Both paths honor `Retry-After` on HTTP 429 responses.
+
+### Safety and resuming
+
+Generated plans, payloads, and append-only receipts live under
+`.localmaxxing-import/`. Successful dry-runs and submissions are skipped when
+the command is run again, so an interrupted upload resumes instead of starting
+over.
+
+Submission requests use a 60-second client timeout by default. A submit timeout
+is recorded as `ambiguous` because the server may have committed the row before
+the connection failed. The next run stops until the operator checks
+LocalMaxxing for that source run ID; use `--retry-ambiguous` only after
+confirming the row was not created. Dry-run timeouts are safe to repeat.
+
+For manual model resolution, `resolve-models` performs only public `GET`
+searches against LocalMaxxing and Hugging Face and never chooses a repository
+automatically:
+
+```bash
+python3 scripts/import_localmaxxing.py resolve-models --model-map model-map.json
+```
+
+Map the checkpoint artifact, not merely its base model. A GGUF, AWQ, FP8, or
+AutoRound alias should point to the repository containing that exact artifact.
+Mapping precedence is exact run ID, checkpoint reference, model variant, then
+model family. Family mappings are used only when a row has no checkpoint or
+variant alias, preventing a quantized artifact from being silently relabeled.
+
 ## Snapshot
 
 <!-- archive-stats:start -->
@@ -127,6 +245,7 @@ for the CPU, driver, CUDA, and per-card limits.
 | [`catalog/`](catalog/README.md) | Models, campaigns, engines, and one page per run |
 | [`METHODOLOGY.md`](METHODOLOGY.md) | Comparison rules, metric meanings, and limitations |
 | [`scripts/query.py`](scripts/query.py) | Small dependency-free JSONL query helper |
+| [`scripts/import_localmaxxing.py`](scripts/import_localmaxxing.py) | Plan, validate, and explicitly submit resumable LocalMaxxing imports |
 
 Local paths are replaced with `${MODEL_ROOT}`, `${ENGINE_ROOT}`, and similar
 variables before publication. The public SQLite file is rebuilt from the
