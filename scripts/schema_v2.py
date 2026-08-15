@@ -289,7 +289,7 @@ def _quant(row: dict[str, Any]) -> tuple[dict[str, Any], str]:
         setq("nvfp4", "nvfp4", 4, recipe="NVFP4")
     elif key.startswith("gguf-"):
         canonical = key.replace("gguf-", "gguf-", 1)
-        bits_match = re.search(r"(?:q|ud-q)(\d+)", key)
+        bits_match = re.search(r"(?:ud-iq|ud-q|iq|q)(\d+)", key)
         setq(canonical, "gguf", int(bits_match.group(1)) if bits_match else None, "gguf")
     elif key == "ud-q4_k_xl".lower():
         setq("gguf-ud-q4_k_xl", "gguf", 4, "gguf")
@@ -335,7 +335,14 @@ def _spec_decode(value: Any) -> Any:
         "draft_model": "draft_model_tli" if "tli" in _clean(value.get("draft")).lower() else "draft_model",
     }
     method = method_map.get(method, method)
-    draft = value.get("draft") or value.get("model")
+    # Accept already-normalized input too, otherwise re-importing any source
+    # rewrites every other row and drops its draft reference.
+    draft = (
+        value.get("draft")
+        or value.get("model")
+        or value.get("draft_path")
+        or value.get("draft_ref")
+    )
     draft_path = draft if isinstance(draft, str) and draft.startswith("/") else None
     draft_ref = Path(draft).name if draft_path else draft
     normalized = {
