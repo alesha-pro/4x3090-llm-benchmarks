@@ -25,14 +25,14 @@ JSONL and run your own analysis.
 | [Dataset files](data/README.md) | JSONL, SQLite, snapshot metadata, and schema notes |
 
 <!-- archive-summary:start -->
-The archive currently has 657 measurements from 21 benchmark campaigns across
-15 model families. Most runs use vLLM. The llama.cpp set is smaller, and the 38
+The archive currently has 1064 measurements from 28 benchmark campaigns across
+18 model families. Most runs use vLLM. The llama.cpp set is smaller, and the 38
 exllamav3 rows came from a short experiment rather than broad engine coverage.
 
 This is a benchmark archive, not a leaderboard. The harness and the variable I
 was testing changed between campaigns, so some rows should not be compared
 directly. Each row keeps its workload, topology, power limit, engine version,
-source references, and launch command when available. 656 of 657 measurements
+source references, and launch command when available. 1063 of 1064 measurements
 retain an exact argv or command.
 <!-- archive-summary:end -->
 
@@ -103,14 +103,14 @@ More examples are in [QUERYING.md](QUERYING.md).
 <!-- archive-stats:start -->
 | Coverage | Count |
 |---|---:|
-| Measurements | 657 |
-| Benchmark campaigns | 21 |
-| Model families | 15 |
-| Quantization categories | 23 |
-| vLLM rows | 531 |
-| llama.cpp rows | 69 |
+| Measurements | 1064 |
+| Benchmark campaigns | 28 |
+| Model families | 18 |
+| Quantization categories | 26 |
+| vLLM rows | 671 |
+| llama.cpp rows | 212 |
 | exllamav3 experimental rows | 38 |
-| Exact launch argv or command | 656 |
+| Exact launch argv or command | 1063 |
 <!-- archive-stats:end -->
 
 The rig is 4x RTX 3090 on PCIe 3.0 x16, with 96 GB of VRAM and no NVLink.
